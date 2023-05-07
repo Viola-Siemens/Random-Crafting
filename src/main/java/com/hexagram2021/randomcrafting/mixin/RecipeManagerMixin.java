@@ -7,6 +7,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.hexagram2021.randomcrafting.config.RCServerConfig;
 import com.hexagram2021.randomcrafting.util.IMessUpRecipes;
+import com.hexagram2021.randomcrafting.util.IMutableItemStack;
 import com.hexagram2021.randomcrafting.util.RCLogger;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -79,8 +80,7 @@ public class RecipeManagerMixin implements IMessUpRecipes {
 			recipeMap.forEach((id, recipe) -> {
 				ItemStack itemStack = originalMap.get(id).getResultItem();
 				ItemStack target = recipe.getResultItem();
-				((ItemStackAccess)(Object) itemStack).setItem(target.getItem());
-				itemStack.setCount(target.getCount());
+				((IMutableItemStack)(Object) itemStack).setItemAndCount(target.getItem(), target.getCount());
 			});
 		});
 	}
@@ -100,8 +100,7 @@ public class RecipeManagerMixin implements IMessUpRecipes {
 		list.forEach(tp -> {
 			ItemStack itemStack = this.recipes.get(tp.getLeft()).get(tp.getMiddle()).getResultItem();
 			ItemStack target = results.get(tp.getRight());
-			((ItemStackAccess)(Object) itemStack).setItem(target.getItem());
-			itemStack.setCount(target.getCount());
+			((IMutableItemStack)(Object) itemStack).setItemAndCount(target.getItem(), target.getCount());
 		});
 	}
 }
