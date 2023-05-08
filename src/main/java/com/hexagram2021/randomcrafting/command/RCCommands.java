@@ -31,11 +31,15 @@ public class RCCommands {
 
 	private static int reshuffle(MinecraftServer server, ServerPlayer entity) {
 		RCServerConfig.SALT.set(entity.getRandom().nextLong());
+		if(RCServerConfig.DISABLE.get()) {
+			RCServerConfig.DISABLE.set(false);
+		}
 		messup(server);
 		return Command.SINGLE_SUCCESS;
 	}
 
 	private static int revoke(MinecraftServer server) {
+		RCServerConfig.DISABLE.set(true);
 		((IMessUpRecipes) server.getRecipeManager()).revoke();
 		return Command.SINGLE_SUCCESS;
 	}

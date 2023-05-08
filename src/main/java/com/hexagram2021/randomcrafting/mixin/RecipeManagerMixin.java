@@ -27,10 +27,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 @Mixin(RecipeManager.class)
 public class RecipeManagerMixin implements IMessUpRecipes {
@@ -89,13 +86,30 @@ public class RecipeManagerMixin implements IMessUpRecipes {
 	public void messup(Random random) {
 		List<Triple<RecipeType<?>, ResourceLocation, Integer>> list = Lists.newArrayList();
 		List<ItemStack> results = Lists.newArrayList();
+		List<RecipeType<?>> recipeTypes = Lists.newArrayList();
+
 		this.backup_recipes.forEach((recipeType, recipeMap) ->
-				recipeMap.forEach((id, recipe) -> {
-					list.add(Triple.of(recipeType, id, results.size()));
-					results.add(recipe.getResultItem());
-				})
+				recipeTypes.add(recipeType)
 		);
-		Collections.shuffle(results, random);
+		recipeTypes.sort(Comparator.comparing(Object::toString));
+
+		if(RCServerConfig.TYPE_SEPARATED.get()) {
+			recipeTypes.forEach(recipeType -> {
+				List<ItemStack> temp_results = Lists.newArrayList();
+				this.backup_recipes.get(recipeType).forEach((id, recipe) -> {
+					list.add(Triple.of(recipeType, id, results.size() + temp_results.size()));
+					temp_results.add(recipe.getResultItem());
+				});
+				Collections.shuffle(temp_results, random);
+				results.addAll(temp_results);
+			});
+		} else {
+			recipeTypes.forEach(recipeType -> this.backup_recipes.get(recipeType).forEach((id, recipe) -> {
+				list.add(Triple.of(recipeType, id, results.size()));
+				results.add(recipe.getResultItem());
+			}));
+			Collections.shuffle(results, random);
+		}
 
 		list.forEach(tp -> {
 			ItemStack itemStack = this.recipes.get(tp.getLeft()).get(tp.getMiddle()).getResultItem();
