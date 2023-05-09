@@ -4,9 +4,13 @@ import com.hexagram2021.randomcrafting.config.RCServerConfig;
 import com.hexagram2021.randomcrafting.util.IMessUpRecipes;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.ChatType;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -23,6 +27,10 @@ public class RCCommands {
 		return Commands.literal("rc").then(
 				Commands.literal("reshuffle").requires(stack -> stack.hasPermission(RCServerConfig.PERMISSION_LEVEL_RESHUFFLE.get()))
 						.executes(context -> reshuffle(context.getSource().getServer(), context.getSource().getPlayerOrException()))
+						.then(
+								Commands.argument("salt", LongArgumentType.longArg())
+										.executes(context -> reshuffle(context.getSource().getServer(), LongArgumentType.getLong(context, "salt")))
+						)
 		).then(
 				Commands.literal("revoke").requires(stack -> stack.hasPermission(RCServerConfig.PERMISSION_LEVEL_REVOKE.get()))
 						.executes(context -> revoke(context.getSource().getServer()))
@@ -30,17 +38,23 @@ public class RCCommands {
 	}
 
 	private static int reshuffle(MinecraftServer server, ServerPlayer entity) {
-		RCServerConfig.SALT.set(entity.getRandom().nextLong());
+		return reshuffle(server, entity.getRandom().nextLong());
+	}
+
+	private static int reshuffle(MinecraftServer server, long seed) {
+		RCServerConfig.SALT.set(seed);
 		if(RCServerConfig.DISABLE.get()) {
 			RCServerConfig.DISABLE.set(false);
 		}
 		messup(server);
+		server.getPlayerList().broadcastMessage(new TranslatableComponent("commands.randomcrafting.reshuffle.success"), ChatType.SYSTEM, Util.NIL_UUID);
 		return Command.SINGLE_SUCCESS;
 	}
 
 	private static int revoke(MinecraftServer server) {
 		RCServerConfig.DISABLE.set(true);
 		((IMessUpRecipes) server.getRecipeManager()).revoke();
+		server.getPlayerList().broadcastMessage(new TranslatableComponent("commands.randomcrafting.revoke.success"), ChatType.SYSTEM, Util.NIL_UUID);
 		return Command.SINGLE_SUCCESS;
 	}
 

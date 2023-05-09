@@ -1,0 +1,8 @@
+{
+  "language": "Chinese",
+  "language.code": "zh_tw",
+  "language.region": "Taiwan, China",
+  
+  "commands.randomcrafting.reshuffle.success": "配方已經被重新打亂！",
+  "commands.randomcrafting.revoke.success": "配方恢復正常了。"
+}

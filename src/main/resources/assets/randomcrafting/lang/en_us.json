@@ -1,0 +1,8 @@
+{
+  "language": "English",
+  "language.code": "en_us",
+  "language.region": "United States",
+  
+  "commands.randomcrafting.reshuffle.success": "Recipes are successfully reshuffled!",
+  "commands.randomcrafting.revoke.success": "Recipes are now back to normal."
+}
