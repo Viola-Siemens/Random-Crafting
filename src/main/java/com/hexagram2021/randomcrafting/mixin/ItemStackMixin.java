@@ -17,13 +17,10 @@ public abstract class ItemStackMixin implements IMutableItemStack {
 	@Mutable @Shadow @Final
 	private IRegistryDelegate<Item> delegate;
 
-	@Shadow
-	public abstract void setCount(int count);
-
 	@Override
 	public void setItemAndCount(Item item, int count) {
 		this.item = item;
 		this.delegate = item.delegate;
-		this.setCount(count);
+		((ItemStack)(Object) this).setCount(count);
 	}
 }
