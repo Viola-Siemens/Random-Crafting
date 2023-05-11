@@ -6,11 +6,10 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.ChatType;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -47,14 +46,14 @@ public class RCCommands {
 			RCServerConfig.DISABLE.set(false);
 		}
 		messup(server);
-		server.getPlayerList().broadcastMessage(new TranslatableComponent("commands.randomcrafting.reshuffle.success"), ChatType.SYSTEM, Util.NIL_UUID);
+		server.getPlayerList().broadcastSystemMessage(Component.translatable("commands.randomcrafting.reshuffle.success"), ChatType.SYSTEM);
 		return Command.SINGLE_SUCCESS;
 	}
 
 	private static int revoke(MinecraftServer server) {
 		RCServerConfig.DISABLE.set(true);
 		((IMessUpRecipes) server.getRecipeManager()).revoke();
-		server.getPlayerList().broadcastMessage(new TranslatableComponent("commands.randomcrafting.revoke.success"), ChatType.SYSTEM, Util.NIL_UUID);
+		server.getPlayerList().broadcastSystemMessage(Component.translatable("commands.randomcrafting.revoke.success"), ChatType.SYSTEM);
 		return Command.SINGLE_SUCCESS;
 	}
 

@@ -5,10 +5,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.hexagram2021.randomcrafting.config.RCCommonConfig;
 import com.hexagram2021.randomcrafting.config.RCServerConfig;
 import com.hexagram2021.randomcrafting.util.IMessUpRecipes;
 import com.hexagram2021.randomcrafting.util.IMutableItemStack;
-import com.hexagram2021.randomcrafting.util.RCLogger;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
@@ -51,16 +51,16 @@ public class RecipeManagerMixin implements IMessUpRecipes {
 
 			try {
 				if (entry.getValue().isJsonObject() && !CraftingHelper.processConditions(entry.getValue().getAsJsonObject(), "conditions", this.context)) {
-					RCLogger.debug("Skipping loading recipe {} as it's conditions were not met", id);
+					//RCLogger.debug("Skipping loading recipe {} as it's conditions were not met", id);
 					continue;
 				}
 				Recipe<?> recipe = RecipeManager.fromJson(id, GsonHelper.convertToJsonObject(entry.getValue(), "top element"), this.context);
 				if (recipe == null) {
-					RCLogger.info("Skipping loading recipe {} as it's serializer returned null", id);
+					//RCLogger.info("Skipping loading recipe {} as it's serializer returned null", id);
 					continue;
 				}
-				if(!RCServerConfig.WHITELIST_RECIPE_TYPES.get().contains(recipe.getType().toString()) &&
-						!RCServerConfig.WHITELIST_RECIPES.get().contains(recipe.getId().toString()) &&
+				if(!RCCommonConfig.WHITELIST_RECIPE_TYPES.get().contains(recipe.getType().toString()) &&
+						!RCCommonConfig.WHITELIST_RECIPES.get().contains(recipe.getId().toString()) &&
 						!recipe.getResultItem().isEmpty()) {
 					backup_map.computeIfAbsent(recipe.getType(), recipeType -> ImmutableMap.builder()).put(id, recipe);
 				}
