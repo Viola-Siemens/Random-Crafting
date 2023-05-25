@@ -18,7 +18,7 @@ plugins {
 }
 apply plugin: 'org.spongepowered.mixin'
 
-version = '1.0.0'
+version = '1.0.1'
 group = 'com.hexagram2021.randomcrafting'
 archivesBaseName = 'randomcrafting'
 
@@ -114,10 +114,6 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 repositories {
     maven { // TOP
         url "https://cursemaven.com"
-    }
-    maven { // JEI
-        name 'DVS1 Maven FS'
-        url 'https://dvs1.progwml6.com/files/maven'
     }
     maven { //mirror
         name = "ModMaven"

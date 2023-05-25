@@ -95,18 +95,27 @@ public class RecipeManagerMixin implements IMessUpRecipes {
 
 		if(RCServerConfig.TYPE_SEPARATED.get()) {
 			recipeTypes.forEach(recipeType -> {
+				RCLogger.debug("Shuffling " + recipeType);
 				List<ItemStack> temp_results = Lists.newArrayList();
 				this.backup_recipes.get(recipeType).forEach((id, recipe) -> {
-					list.add(Triple.of(recipeType, id, results.size() + temp_results.size()));
-					temp_results.add(recipe.getResultItem());
+					if(this.recipes.get(recipeType).get(id) == null) {
+						RCLogger.error("Find a null recipe: " + recipeType + " - <" + id + ">");
+					} else {
+						list.add(Triple.of(recipeType, id, results.size() + temp_results.size()));
+						temp_results.add(recipe.getResultItem());
+					}
 				});
 				Collections.shuffle(temp_results, random);
 				results.addAll(temp_results);
 			});
 		} else {
 			recipeTypes.forEach(recipeType -> this.backup_recipes.get(recipeType).forEach((id, recipe) -> {
-				list.add(Triple.of(recipeType, id, results.size()));
-				results.add(recipe.getResultItem());
+				if(this.recipes.get(recipeType).get(id) == null) {
+					RCLogger.error("Find a null recipe: " + recipeType + " - <" + id + ">");
+				} else {
+					list.add(Triple.of(recipeType, id, results.size()));
+					results.add(recipe.getResultItem());
+				}
 			}));
 			Collections.shuffle(results, random);
 		}
