@@ -18,6 +18,9 @@ public class RCServerConfig {
 	public static final ForgeConfigSpec.ConfigValue<List<? extends String>> WHITELIST_RECIPE_TYPES;
 	public static final ForgeConfigSpec.ConfigValue<List<? extends String>> WHITELIST_RECIPES;
 
+	public static final ForgeConfigSpec.IntValue AUTO_REFRESH_SECOND;
+	public static final ForgeConfigSpec.BooleanValue AUTO_REFRESH_CALLBACK;
+
 	static {
 		BUILDER.push("randomcrafting-server-config");
 			SALT = BUILDER.comment("The salt for random messing up the recipes. You can change it dynamically by using command `/rc reshuffle`.")
@@ -39,6 +42,11 @@ public class RCServerConfig {
 					.defineList("WHITELIST_RECIPES", ImmutableList.of(
 							new ResourceLocation("map").toString()
 					), o -> ResourceLocation.isValidResourceLocation((String)o));
+
+			AUTO_REFRESH_SECOND = BUILDER.comment("Set to x (x > 0), server will automatically reshuffle recipes every x seconds. Set to 0 to disable.")
+					.defineInRange("AUTO_REFRESH_SECOND", 0, 0, 2147483647);
+			AUTO_REFRESH_CALLBACK = BUILDER.comment("Send message after automatically reshuffling recipes to every players online or not.")
+					.define("AUTO_REFRESH_CALLBACK", false);
 		BUILDER.pop();
 		SPEC = BUILDER.build();
 	}
