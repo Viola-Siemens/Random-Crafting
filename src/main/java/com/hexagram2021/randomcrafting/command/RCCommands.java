@@ -13,9 +13,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundUpdateRecipesPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
 import net.minecraftforge.event.RegisterCommandsEvent;
-
-import java.util.Random;
 
 public class RCCommands {
 	public static void registerCommands(RegisterCommandsEvent event) {
@@ -62,7 +61,7 @@ public class RCCommands {
 
 	public static void messup(MinecraftServer server) {
 		long seed = server.getWorldData().worldGenSettings().seed() ^ RCServerConfig.SALT.get();
-		Random random = new Random(seed);
+		RandomSource random = RandomSource.create(seed);
 		((IMessUpRecipes) server.getRecipeManager()).messup(random);
 	}
 

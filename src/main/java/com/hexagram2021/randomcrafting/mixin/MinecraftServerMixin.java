@@ -7,6 +7,7 @@ import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.players.PlayerList;
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.crafting.RecipeManager;
 import org.spongepowered.asm.mixin.Final;
@@ -16,7 +17,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.Random;
 import java.util.function.BooleanSupplier;
 
 @Mixin(MinecraftServer.class)
@@ -28,7 +28,7 @@ public abstract class MinecraftServerMixin {
 	private ProfilerFiller profiler;
 
 	@Shadow @Final
-	private Random random;
+	private RandomSource random;
 
 	@Shadow
 	public abstract RecipeManager getRecipeManager();

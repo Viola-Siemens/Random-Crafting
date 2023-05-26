@@ -9,10 +9,12 @@ import com.hexagram2021.randomcrafting.config.RCCommonConfig;
 import com.hexagram2021.randomcrafting.config.RCServerConfig;
 import com.hexagram2021.randomcrafting.util.IMessUpRecipes;
 import com.hexagram2021.randomcrafting.util.IMutableItemStack;
+import com.hexagram2021.randomcrafting.util.ListShuffler;
 import com.hexagram2021.randomcrafting.util.RCLogger;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
@@ -84,7 +86,7 @@ public class RecipeManagerMixin implements IMessUpRecipes {
 	}
 
 	@Override
-	public void messup(Random random) {
+	public void messup(RandomSource random) {
 		List<Triple<RecipeType<?>, ResourceLocation, Integer>> list = Lists.newArrayList();
 		List<ItemStack> results = Lists.newArrayList();
 		List<RecipeType<?>> recipeTypes = Lists.newArrayList();
@@ -106,7 +108,7 @@ public class RecipeManagerMixin implements IMessUpRecipes {
 						temp_results.add(recipe.getResultItem());
 					}
 				});
-				Collections.shuffle(temp_results, random);
+				ListShuffler.shuffle(temp_results, random);
 				results.addAll(temp_results);
 			});
 		} else {
@@ -118,7 +120,7 @@ public class RecipeManagerMixin implements IMessUpRecipes {
 					results.add(recipe.getResultItem());
 				}
 			}));
-			Collections.shuffle(results, random);
+			ListShuffler.shuffle(results, random);
 		}
 
 		list.forEach(tp -> {
