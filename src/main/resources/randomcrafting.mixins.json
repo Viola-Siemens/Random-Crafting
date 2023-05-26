@@ -5,6 +5,7 @@
   "refmap": "randomcrafting.refmap.json",
   "mixins": [
     "ItemStackMixin",
+    "MinecraftServerMixin",
     "RecipeManagerMixin"
   ],
   "minVersion": "0.8"

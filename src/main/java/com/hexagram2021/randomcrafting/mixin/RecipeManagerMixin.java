@@ -9,6 +9,7 @@ import com.hexagram2021.randomcrafting.config.RCCommonConfig;
 import com.hexagram2021.randomcrafting.config.RCServerConfig;
 import com.hexagram2021.randomcrafting.util.IMessUpRecipes;
 import com.hexagram2021.randomcrafting.util.IMutableItemStack;
+import com.hexagram2021.randomcrafting.util.RCLogger;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
@@ -51,12 +52,12 @@ public class RecipeManagerMixin implements IMessUpRecipes {
 
 			try {
 				if (entry.getValue().isJsonObject() && !CraftingHelper.processConditions(entry.getValue().getAsJsonObject(), "conditions", this.context)) {
-					//RCLogger.debug("Skipping loading recipe {} as it's conditions were not met", id);
+					RCLogger.debug("Skipping loading recipe {} as it's conditions were not met", id);
 					continue;
 				}
 				Recipe<?> recipe = RecipeManager.fromJson(id, GsonHelper.convertToJsonObject(entry.getValue(), "top element"), this.context);
 				if (recipe == null) {
-					//RCLogger.info("Skipping loading recipe {} as it's serializer returned null", id);
+					RCLogger.info("Skipping loading recipe {} as it's serializer returned null", id);
 					continue;
 				}
 				if(!RCCommonConfig.WHITELIST_RECIPE_TYPES.get().contains(recipe.getType().toString()) &&
@@ -95,18 +96,27 @@ public class RecipeManagerMixin implements IMessUpRecipes {
 
 		if(RCServerConfig.TYPE_SEPARATED.get()) {
 			recipeTypes.forEach(recipeType -> {
+				RCLogger.debug("Shuffling " + recipeType);
 				List<ItemStack> temp_results = Lists.newArrayList();
 				this.backup_recipes.get(recipeType).forEach((id, recipe) -> {
-					list.add(Triple.of(recipeType, id, results.size() + temp_results.size()));
-					temp_results.add(recipe.getResultItem());
+					if(this.recipes.get(recipeType).get(id) == null) {
+						RCLogger.error("Find a null recipe: " + recipeType + " - <" + id + ">");
+					} else {
+						list.add(Triple.of(recipeType, id, results.size() + temp_results.size()));
+						temp_results.add(recipe.getResultItem());
+					}
 				});
 				Collections.shuffle(temp_results, random);
 				results.addAll(temp_results);
 			});
 		} else {
 			recipeTypes.forEach(recipeType -> this.backup_recipes.get(recipeType).forEach((id, recipe) -> {
-				list.add(Triple.of(recipeType, id, results.size()));
-				results.add(recipe.getResultItem());
+				if(this.recipes.get(recipeType).get(id) == null) {
+					RCLogger.error("Find a null recipe: " + recipeType + " - <" + id + ">");
+				} else {
+					list.add(Triple.of(recipeType, id, results.size()));
+					results.add(recipe.getResultItem());
+				}
 			}));
 			Collections.shuffle(results, random);
 		}

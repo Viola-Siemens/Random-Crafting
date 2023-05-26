@@ -10,6 +10,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundUpdateRecipesPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -46,6 +47,7 @@ public class RCCommands {
 			RCServerConfig.DISABLE.set(false);
 		}
 		messup(server);
+		sendRecipeUpdatePacket(server);
 		server.getPlayerList().broadcastSystemMessage(Component.translatable("commands.randomcrafting.reshuffle.success"), ChatType.SYSTEM);
 		return Command.SINGLE_SUCCESS;
 	}
@@ -53,6 +55,7 @@ public class RCCommands {
 	private static int revoke(MinecraftServer server) {
 		RCServerConfig.DISABLE.set(true);
 		((IMessUpRecipes) server.getRecipeManager()).revoke();
+		sendRecipeUpdatePacket(server);
 		server.getPlayerList().broadcastSystemMessage(Component.translatable("commands.randomcrafting.revoke.success"), ChatType.SYSTEM);
 		return Command.SINGLE_SUCCESS;
 	}
@@ -61,5 +64,14 @@ public class RCCommands {
 		long seed = server.getWorldData().worldGenSettings().seed() ^ RCServerConfig.SALT.get();
 		Random random = new Random(seed);
 		((IMessUpRecipes) server.getRecipeManager()).messup(random);
+	}
+
+	private static void sendRecipeUpdatePacket(MinecraftServer server) {
+		ClientboundUpdateRecipesPacket clientboundupdaterecipespacket = new ClientboundUpdateRecipesPacket(server.getRecipeManager().getRecipes());
+
+		for(ServerPlayer serverplayer : server.getPlayerList().getPlayers()) {
+			serverplayer.connection.send(clientboundupdaterecipespacket);
+			serverplayer.getRecipeBook().sendInitialRecipeBook(serverplayer);
+		}
 	}
 }

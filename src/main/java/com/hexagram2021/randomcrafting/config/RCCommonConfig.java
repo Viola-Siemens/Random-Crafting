@@ -13,7 +13,7 @@ public class RCCommonConfig {
 	public static final ForgeConfigSpec.ConfigValue<List<? extends String>> WHITELIST_RECIPES;
 	
 	static {
-		BUILDER.push("randomcrafting-server-config");
+		BUILDER.push("randomcrafting-common-config");
 			WHITELIST_RECIPE_TYPES = BUILDER.comment("The whitelist of recipe types that will not be messed up by this mod. For example, \"smithing\" to keep smithing table recipes (upgrading diamond gear to netherite gear) away from messing up.")
 					.defineList("WHITELIST_RECIPE_TYPES", ImmutableList.of(
 							new ResourceLocation("emeraldcraft", "melter").toString()
