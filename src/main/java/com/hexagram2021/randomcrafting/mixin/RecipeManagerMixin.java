@@ -75,9 +75,13 @@ public class RecipeManagerMixin implements IMessUpRecipes {
 		this.backup_recipes.forEach((recipeType, recipeMap) -> {
 			Map<ResourceLocation, Recipe<?>> originalMap = this.recipes.get(recipeType);
 			recipeMap.forEach((id, recipe) -> {
-				ItemStack itemStack = originalMap.get(id).getResultItem();
-				ItemStack target = recipe.getResultItem();
-				((IMutableItemStack)(Object) itemStack).setItemAndCount(target.getItem(), target.getCount());
+				if(originalMap.get(id) == null) {
+					RCLogger.error("Find a null recipe: " + recipeType + " - <" + id + ">");
+				} else {
+					ItemStack itemStack = originalMap.get(id).getResultItem();
+					ItemStack target = recipe.getResultItem();
+					((IMutableItemStack) (Object) itemStack).setItemAndCount(target.getItem(), target.getCount());
+				}
 			});
 		});
 	}
