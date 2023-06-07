@@ -1,5 +1,6 @@
 package com.hexagram2021.randomcrafting.mixin;
 
+import com.hexagram2021.randomcrafting.command.RCCommands;
 import com.hexagram2021.randomcrafting.config.RCServerConfig;
 import com.hexagram2021.randomcrafting.util.IMessUpRecipes;
 import com.hexagram2021.randomcrafting.util.RCLogger;
@@ -42,12 +43,12 @@ public abstract class MinecraftServerMixin {
 	@Inject(method = "tickServer", at = @At(value = "TAIL"))
 	public void tryReshuffling(BooleanSupplier hasTime, CallbackInfo ci) {
 		long second = RCServerConfig.AUTO_REFRESH_SECOND.get();
-		if(second > 0 && this.tickCount - this.lastAutoRefreshRecipeTick >= second * 20) {
+		if(second > 0 && this.tickCount - this.lastAutoRefreshRecipeTick >= second * 20 && !RCServerConfig.DISABLE.get()) {
 			this.lastAutoRefreshRecipeTick = this.tickCount;
 			RCLogger.debug("Auto refresh recipes!");
 			this.profiler.push("randomcrafting:refresh_recipes");
-			IMessUpRecipes recipeManager = (IMessUpRecipes) this.getRecipeManager();
-			recipeManager.messup(this.random);
+			RCServerConfig.SALT.set(this.random.nextLong());
+			RCCommands.messup((MinecraftServer)(Object)this);
 			if(RCServerConfig.AUTO_REFRESH_CALLBACK.get()) {
 				this.getPlayerList().broadcastMessage(
 						new TranslatableComponent("commands.randomcrafting.reshuffle.success"), ChatType.SYSTEM, Util.NIL_UUID
