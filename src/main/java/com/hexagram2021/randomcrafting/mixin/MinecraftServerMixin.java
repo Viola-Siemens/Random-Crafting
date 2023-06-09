@@ -39,22 +39,31 @@ public abstract class MinecraftServerMixin {
 	public abstract PlayerList getPlayerList();
 
 	private int lastAutoRefreshRecipeTick = 0;
+	
+	private boolean nextReshuffle = true;
 
 	@Inject(method = "tickServer", at = @At(value = "TAIL"))
 	public void tryReshuffling(BooleanSupplier hasTime, CallbackInfo ci) {
 		long second = RCServerConfig.AUTO_REFRESH_SECOND.get();
-		if(second > 0 && this.tickCount - this.lastAutoRefreshRecipeTick >= second * 20 && !RCServerConfig.DISABLE.get()) {
-			this.lastAutoRefreshRecipeTick = this.tickCount;
-			RCLogger.debug("Auto refresh recipes!");
-			this.profiler.push("randomcrafting:refresh_recipes");
-			RCServerConfig.SALT.set(this.random.nextLong());
-			RCCommands.messup((MinecraftServer)(Object)this);
-			if(RCServerConfig.AUTO_REFRESH_CALLBACK.get()) {
-				this.getPlayerList().broadcastMessage(
-						new TranslatableComponent("commands.randomcrafting.reshuffle.success"), ChatType.SYSTEM, Util.NIL_UUID
-				);
+		if(second > 0 && this.tickCount - this.lastAutoRefreshRecipeTick >= second * 20) {
+			if(RCServerConfig.DISABLE.get()) {
+				this.nextReshuffle = false;
+			} else if(this.nextReshuffle) {
+				this.lastAutoRefreshRecipeTick = this.tickCount;
+				RCLogger.debug("Auto refresh recipes!");
+				this.profiler.push("randomcrafting:refresh_recipes");
+				RCServerConfig.SALT.set(this.random.nextLong());
+				RCCommands.messup((MinecraftServer)(Object)this);
+				if(RCServerConfig.AUTO_REFRESH_CALLBACK.get()) {
+					this.getPlayerList().broadcastMessage(
+							new TranslatableComponent("commands.randomcrafting.reshuffle.success"), ChatType.SYSTEM, Util.NIL_UUID
+					);
+				}
+				this.profiler.pop();
+			} else {
+				this.lastAutoRefreshRecipeTick = this.tickCount;
+				this.nextReshuffle = true;
 			}
-			this.profiler.pop();
 		}
 	}
 }
