@@ -17,10 +17,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.common.crafting.conditions.ICondition;
 import org.apache.commons.lang3.tuple.Triple;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -31,9 +28,6 @@ import java.util.*;
 
 @Mixin(RecipeManager.class)
 public class RecipeManagerMixin implements IMessUpRecipes {
-	@Shadow @Final
-	private ICondition.IContext context;
-
 	@Shadow
 	private Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> recipes;
 
@@ -50,11 +44,7 @@ public class RecipeManagerMixin implements IMessUpRecipes {
 			}
 
 			try {
-				if (entry.getValue().isJsonObject() && !CraftingHelper.processConditions(entry.getValue().getAsJsonObject(), "conditions", this.context)) {
-					RCLogger.debug("Skipping loading recipe {} as it's conditions were not met", id);
-					continue;
-				}
-				Recipe<?> recipe = RecipeManager.fromJson(id, GsonHelper.convertToJsonObject(entry.getValue(), "top element"), this.context);
+				Recipe<?> recipe = RecipeManager.fromJson(id, GsonHelper.convertToJsonObject(entry.getValue(), "top element"));
 				if (recipe == null) {
 					RCLogger.info("Skipping loading recipe {} as it's serializer returned null", id);
 					continue;
