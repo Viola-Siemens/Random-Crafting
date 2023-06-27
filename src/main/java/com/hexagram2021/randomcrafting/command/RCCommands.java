@@ -46,7 +46,6 @@ public class RCCommands {
 			RCServerConfig.DISABLE.set(false);
 		}
 		messup(server);
-		sendRecipeUpdatePacket(server);
 		server.getPlayerList().broadcastSystemMessage(Component.translatable("commands.randomcrafting.reshuffle.success"), ChatType.SYSTEM);
 		return Command.SINGLE_SUCCESS;
 	}
@@ -63,6 +62,7 @@ public class RCCommands {
 		long seed = server.getWorldData().worldGenSettings().seed() ^ RCServerConfig.SALT.get();
 		RandomSource random = RandomSource.create(seed);
 		((IMessUpRecipes) server.getRecipeManager()).messup(random);
+		sendRecipeUpdatePacket(server);
 	}
 
 	private static void sendRecipeUpdatePacket(MinecraftServer server) {

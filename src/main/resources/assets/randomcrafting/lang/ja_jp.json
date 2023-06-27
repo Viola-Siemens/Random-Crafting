@@ -1,0 +1,8 @@
+{
+  "language": "Japanese",
+  "language.code": "ja_jp",
+  "language.region": "Japan",
+  
+  "commands.randomcrafting.reshuffle.success": "レシピはめちゃくちゃになりました！",
+  "commands.randomcrafting.revoke.success": "レシピは本来の様子に戻りました。"
+}

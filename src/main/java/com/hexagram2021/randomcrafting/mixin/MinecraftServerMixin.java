@@ -1,8 +1,10 @@
 package com.hexagram2021.randomcrafting.mixin;
 
+import com.hexagram2021.randomcrafting.command.RCCommands;
 import com.hexagram2021.randomcrafting.config.RCServerConfig;
 import com.hexagram2021.randomcrafting.util.IMessUpRecipes;
 import com.hexagram2021.randomcrafting.util.RCLogger;
+import net.minecraft.Util;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -37,22 +39,31 @@ public abstract class MinecraftServerMixin {
 	public abstract PlayerList getPlayerList();
 
 	private int lastAutoRefreshRecipeTick = 0;
+	
+	private boolean nextRandomCraftingReshuffle = true;
 
 	@Inject(method = "tickServer", at = @At(value = "TAIL"))
 	public void tryReshuffling(BooleanSupplier hasTime, CallbackInfo ci) {
 		long second = RCServerConfig.AUTO_REFRESH_SECOND.get();
 		if(second > 0 && this.tickCount - this.lastAutoRefreshRecipeTick >= second * 20) {
-			this.lastAutoRefreshRecipeTick = this.tickCount;
-			RCLogger.debug("Auto refresh recipes!");
-			this.profiler.push("randomcrafting:refresh_recipes");
-			IMessUpRecipes recipeManager = (IMessUpRecipes) this.getRecipeManager();
-			recipeManager.messup(this.random);
-			if(RCServerConfig.AUTO_REFRESH_CALLBACK.get()) {
-				this.getPlayerList().broadcastSystemMessage(
-						Component.translatable("commands.randomcrafting.reshuffle.success"), ChatType.SYSTEM
-				);
+			if(RCServerConfig.DISABLE.get()) {
+				this.nextRandomCraftingReshuffle = false;
+			} else if(this.nextRandomCraftingReshuffle) {
+				this.lastAutoRefreshRecipeTick = this.tickCount;
+				RCLogger.debug("Auto refresh recipes!");
+				this.profiler.push("randomcrafting:refresh_recipes");
+				RCServerConfig.SALT.set(this.random.nextLong());
+				RCCommands.messup((MinecraftServer)(Object)this);
+				if(RCServerConfig.AUTO_REFRESH_CALLBACK.get()) {
+					this.getPlayerList().broadcastSystemMessage(
+							Component.translatable("commands.randomcrafting.reshuffle.success"), ChatType.SYSTEM
+					);
+				}
+				this.profiler.pop();
+			} else {
+				this.lastAutoRefreshRecipeTick = this.tickCount;
+				this.nextRandomCraftingReshuffle = true;
 			}
-			this.profiler.pop();
 		}
 	}
 }
