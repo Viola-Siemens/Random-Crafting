@@ -2,16 +2,12 @@ package com.hexagram2021.randomcrafting.mixin;
 
 import com.hexagram2021.randomcrafting.command.RCCommands;
 import com.hexagram2021.randomcrafting.config.RCServerConfig;
-import com.hexagram2021.randomcrafting.util.IMessUpRecipes;
 import com.hexagram2021.randomcrafting.util.RCLogger;
-import net.minecraft.Util;
-import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraft.world.item.crafting.RecipeManager;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -31,9 +27,6 @@ public abstract class MinecraftServerMixin {
 
 	@Shadow @Final
 	private RandomSource random;
-
-	@Shadow
-	public abstract RecipeManager getRecipeManager();
 
 	@Shadow
 	public abstract PlayerList getPlayerList();
@@ -56,7 +49,7 @@ public abstract class MinecraftServerMixin {
 				RCCommands.messup((MinecraftServer)(Object)this);
 				if(RCServerConfig.AUTO_REFRESH_CALLBACK.get()) {
 					this.getPlayerList().broadcastSystemMessage(
-							Component.translatable("commands.randomcrafting.reshuffle.success"), ChatType.SYSTEM
+							Component.translatable("commands.randomcrafting.reshuffle.success"), false
 					);
 				}
 				this.profiler.pop();

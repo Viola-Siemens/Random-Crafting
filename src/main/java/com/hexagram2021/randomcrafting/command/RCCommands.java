@@ -8,7 +8,6 @@ import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundUpdateRecipesPacket;
 import net.minecraft.server.MinecraftServer;
@@ -46,7 +45,7 @@ public class RCCommands {
 			RCServerConfig.DISABLE.set(false);
 		}
 		messup(server);
-		server.getPlayerList().broadcastSystemMessage(Component.translatable("commands.randomcrafting.reshuffle.success"), ChatType.SYSTEM);
+		server.getPlayerList().broadcastSystemMessage(Component.translatable("commands.randomcrafting.reshuffle.success"), false);
 		return Command.SINGLE_SUCCESS;
 	}
 
@@ -54,7 +53,7 @@ public class RCCommands {
 		RCServerConfig.DISABLE.set(true);
 		((IMessUpRecipes) server.getRecipeManager()).revoke();
 		sendRecipeUpdatePacket(server);
-		server.getPlayerList().broadcastSystemMessage(Component.translatable("commands.randomcrafting.revoke.success"), ChatType.SYSTEM);
+		server.getPlayerList().broadcastSystemMessage(Component.translatable("commands.randomcrafting.revoke.success"), false);
 		return Command.SINGLE_SUCCESS;
 	}
 
