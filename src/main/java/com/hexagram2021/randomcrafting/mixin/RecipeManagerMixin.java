@@ -58,7 +58,7 @@ public class RecipeManagerMixin implements IMessUpRecipes {
 					continue;
 				}
 				Recipe<?> recipe = RecipeManager.fromJson(id, GsonHelper.convertToJsonObject(entry.getValue(), "top element"), this.context);
-				if (recipe == null) {
+				if (recipe == null) {	//CraftTweaker
 					RCLogger.info("Skipping loading recipe {} as it's serializer returned null", id);
 					continue;
 				}

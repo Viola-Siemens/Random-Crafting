@@ -58,7 +58,7 @@ public class RCCommands {
 	}
 
 	public static void messup(MinecraftServer server) {
-		long seed = server.getWorldData().worldGenSettings().seed() ^ RCServerConfig.SALT.get();
+		long seed = server.getWorldData().worldGenOptions().seed() ^ RCServerConfig.SALT.get();
 		RandomSource random = RandomSource.create(seed);
 		((IMessUpRecipes) server.getRecipeManager()).messup(random);
 		sendRecipeUpdatePacket(server);
