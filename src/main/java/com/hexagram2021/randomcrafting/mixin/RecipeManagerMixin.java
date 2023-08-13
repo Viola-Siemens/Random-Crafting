@@ -11,6 +11,7 @@ import com.hexagram2021.randomcrafting.util.IMessUpRecipes;
 import com.hexagram2021.randomcrafting.util.IMutableItemStack;
 import com.hexagram2021.randomcrafting.util.ListShuffler;
 import com.hexagram2021.randomcrafting.util.RCLogger;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.GsonHelper;
@@ -63,8 +64,7 @@ public class RecipeManagerMixin implements IMessUpRecipes {
 					continue;
 				}
 				if(!RCCommonConfig.WHITELIST_RECIPE_TYPES.get().contains(recipe.getType().toString()) &&
-						!RCCommonConfig.WHITELIST_RECIPES.get().contains(recipe.getId().toString()) &&
-						!recipe.getResultItem().isEmpty()) {
+						!RCCommonConfig.WHITELIST_RECIPES.get().contains(recipe.getId().toString())) {
 					backup_map.computeIfAbsent(recipe.getType(), recipeType -> ImmutableMap.builder()).put(id, recipe);
 				}
 			} catch (IllegalArgumentException | JsonParseException ignored) { }
@@ -74,15 +74,15 @@ public class RecipeManagerMixin implements IMessUpRecipes {
 	}
 
 	@Override
-	public void revoke() {
+	public void revoke(RegistryAccess registryAccess) {
 		this.backup_recipes.forEach((recipeType, recipeMap) -> {
 			Map<ResourceLocation, Recipe<?>> originalMap = this.recipes.get(recipeType);
 			recipeMap.forEach((id, recipe) -> {
 				if(originalMap.get(id) == null) {
 					RCLogger.error("Find a null recipe: " + recipeType + " - <" + id + ">");
 				} else {
-					ItemStack itemStack = originalMap.get(id).getResultItem();
-					ItemStack target = recipe.getResultItem();
+					ItemStack itemStack = originalMap.get(id).getResultItem(registryAccess);
+					ItemStack target = recipe.getResultItem(registryAccess);
 					((IMutableItemStack) (Object) itemStack).setItemAndCount(target.getItem(), target.getCount());
 				}
 			});
@@ -90,7 +90,7 @@ public class RecipeManagerMixin implements IMessUpRecipes {
 	}
 
 	@Override
-	public void messup(RandomSource random) {
+	public void messup(RandomSource random, RegistryAccess registryAccess) {
 		List<Triple<RecipeType<?>, ResourceLocation, Integer>> list = Lists.newArrayList();
 		List<ItemStack> results = Lists.newArrayList();
 		List<RecipeType<?>> recipeTypes = Lists.newArrayList();
@@ -109,7 +109,7 @@ public class RecipeManagerMixin implements IMessUpRecipes {
 						RCLogger.error("Find a null recipe: " + recipeType + " - <" + id + ">");
 					} else {
 						list.add(Triple.of(recipeType, id, results.size() + temp_results.size()));
-						temp_results.add(recipe.getResultItem());
+						temp_results.add(recipe.getResultItem(registryAccess));
 					}
 				});
 				ListShuffler.shuffle(temp_results, random);
@@ -121,14 +121,14 @@ public class RecipeManagerMixin implements IMessUpRecipes {
 					RCLogger.error("Find a null recipe: " + recipeType + " - <" + id + ">");
 				} else {
 					list.add(Triple.of(recipeType, id, results.size()));
-					results.add(recipe.getResultItem());
+					results.add(recipe.getResultItem(registryAccess));
 				}
 			}));
 			ListShuffler.shuffle(results, random);
 		}
 
 		list.forEach(tp -> {
-			ItemStack itemStack = this.recipes.get(tp.getLeft()).get(tp.getMiddle()).getResultItem();
+			ItemStack itemStack = this.recipes.get(tp.getLeft()).get(tp.getMiddle()).getResultItem(registryAccess);
 			ItemStack target = results.get(tp.getRight());
 			((IMutableItemStack)(Object) itemStack).setItemAndCount(target.getItem(), target.getCount());
 		});

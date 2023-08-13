@@ -51,7 +51,7 @@ public class RCCommands {
 
 	private static int revoke(MinecraftServer server) {
 		RCServerConfig.DISABLE.set(true);
-		((IMessUpRecipes) server.getRecipeManager()).revoke();
+		((IMessUpRecipes) server.getRecipeManager()).revoke(server.registryAccess());
 		sendRecipeUpdatePacket(server);
 		server.getPlayerList().broadcastSystemMessage(Component.translatable("commands.randomcrafting.revoke.success"), false);
 		return Command.SINGLE_SUCCESS;
@@ -60,7 +60,7 @@ public class RCCommands {
 	public static void messup(MinecraftServer server) {
 		long seed = server.getWorldData().worldGenOptions().seed() ^ RCServerConfig.SALT.get();
 		RandomSource random = RandomSource.create(seed);
-		((IMessUpRecipes) server.getRecipeManager()).messup(random);
+		((IMessUpRecipes) server.getRecipeManager()).messup(random, server.registryAccess());
 		sendRecipeUpdatePacket(server);
 	}
 
