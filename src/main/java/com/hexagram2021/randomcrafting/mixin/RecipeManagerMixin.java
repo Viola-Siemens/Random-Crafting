@@ -31,6 +31,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 @Mixin(RecipeManager.class)
@@ -41,6 +42,7 @@ public class RecipeManagerMixin implements IMessUpRecipes {
 	@Shadow
 	private Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> recipes;
 
+	@Nullable
 	private Map<RecipeType<?>, Map<ResourceLocation, Recipe<?>>> backup_recipes;
 
 	@Inject(method = "apply(Ljava/util/Map;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V", at = @At(value = "TAIL"))
@@ -75,7 +77,7 @@ public class RecipeManagerMixin implements IMessUpRecipes {
 
 	@Override
 	public void revoke(RegistryAccess registryAccess) {
-		this.backup_recipes.forEach((recipeType, recipeMap) -> {
+		Objects.requireNonNull(this.backup_recipes).forEach((recipeType, recipeMap) -> {
 			Map<ResourceLocation, Recipe<?>> originalMap = this.recipes.get(recipeType);
 			recipeMap.forEach((id, recipe) -> {
 				if(originalMap.get(id) == null) {
@@ -94,8 +96,8 @@ public class RecipeManagerMixin implements IMessUpRecipes {
 		List<Triple<RecipeType<?>, ResourceLocation, Integer>> list = Lists.newArrayList();
 		List<ItemStack> results = Lists.newArrayList();
 		List<RecipeType<?>> recipeTypes = Lists.newArrayList();
-
-		this.backup_recipes.forEach((recipeType, recipeMap) ->
+		
+		Objects.requireNonNull(this.backup_recipes).forEach((recipeType, recipeMap) ->
 				recipeTypes.add(recipeType)
 		);
 		recipeTypes.sort(Comparator.comparing(Object::toString));
