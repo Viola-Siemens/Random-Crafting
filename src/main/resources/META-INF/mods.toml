@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[45,)"
+loaderVersion="[46,)"
 license="LGPL"
 issueTrackerURL="https://github.com/Viola-Siemens/Random-Crafting/issues"
 
@@ -17,13 +17,13 @@ All recipes are messed up by this mod. You may be able to get a stick from a iro
 [[dependencies.randomcrafting]]
     modId="forge"
     mandatory=true
-    versionRange="[45,)"
+    versionRange="[46,)"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.randomcrafting]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.19.4,1.20)"
+    versionRange="[1.20,1.21)"
     ordering="NONE"
     side="BOTH"
