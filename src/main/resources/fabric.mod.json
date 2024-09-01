@@ -21,16 +21,15 @@
       "com.hexagram2021.randomcrafting.RandomCrafting"
     ]
   },
-  "accessWidener": "randomcrafting.accessWidener",
   "mixins": [
     "randomcrafting.mixins.json"
   ],
 
   "depends": {
-    "fabricloader": ">=0.14.12",
+    "fabricloader": ">=0.15.0",
     "fabric": "*",
     "forgeconfigapiport": "*",
-    "minecraft": ">=1.20.2 <1.21",
+    "minecraft": ">=1.20.2 <1.21.1",
     "java": ">=17"
   }
 }

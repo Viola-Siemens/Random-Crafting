@@ -1,12 +1,16 @@
 {
   "required": true,
+  "minVersion": "0.8",
   "package": "com.hexagram2021.randomcrafting.mixin",
   "compatibilityLevel": "JAVA_17",
-  "refmap": "randomcrafting-refmap.json",
   "mixins": [
-    "ItemStackMixin",
     "MinecraftServerMixin",
     "RecipeManagerMixin"
   ],
-  "minVersion": "0.8"
+  "client": [
+    "ItemStackMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
 }
